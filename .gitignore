@@ -2,4 +2,6 @@
 /.idea/
 /_creds/
 /_db/
+/reports/
 __pycache__
+temp
