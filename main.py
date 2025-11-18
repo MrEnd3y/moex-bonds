@@ -10,7 +10,7 @@ def timediff(start: datetime):
     return datetime.datetime.fromtimestamp(d.total_seconds()).strftime("%M:%S")
 
 
-def _update_bonds():
+def _update_bonds(start_time: datetime):
     # добаляю спеки облиги (их тоже нужно обновлять, напр за дату след купона)
     # добалвю расчет доходностей yields (кот мосбиржа считает раз в сутки по пред дню)
     # считаю только те что is_traded = True, это ~2700 из 8000 облиг
@@ -25,7 +25,7 @@ def _update_bonds():
         # db.update_bond_from_json(bond, moex.get_yield(bond.secid))
         db.session.commit()
 
-        click.echo(click.style(timediff(datetime.datetime.now()),
+        click.echo(click.style(timediff(start_time),
                    fg='yellow') + " / " + str(bond))
 
 
@@ -55,13 +55,14 @@ def get_bonds():
         db.session.commit()
         click.echo(click.style(timediff(start_time),
                    fg='yellow') + f" / page {page}")
-    _update_bonds()
+    _update_bonds(start_time)
 
 
 @click.command()
 def update_bonds():
+    start_time = datetime.datetime.now()
     db.reset_all_updated()
-    _update_bonds()
+    _update_bonds(start_time)
 
 
 @click.command()
