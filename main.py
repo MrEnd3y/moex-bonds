@@ -25,7 +25,7 @@ def _update_bonds():
         # db.update_bond_from_json(bond, moex.get_yield(bond.secid))
         db.session.commit()
 
-         click.echo(click.style(timediff(start_time),
+        click.echo(click.style(timediff(datetime.datetime.now()),
                    fg='yellow') + " / " + str(bond))
 
 
@@ -206,8 +206,6 @@ def export_bonds(filename, only_buyback, all_data):
 
         except Exception as e:
             click.secho(f"Ошибка при создании отчета: {str(e)}", fg='red')
-
-
 
 
 if __name__ == '__main__':
