@@ -338,6 +338,7 @@ class Moex:
         coupon_value = specs.get("couponvalue")
         remaining_coupons = specs.get("remaining_coupons")
         days_to_buyback = specs.get("days_to_buyback")
+        days_to_coupondate = specs.get("days_to_coupondate")
         if any(value is None for value in [initial_face_value, price_percent, coupon_value, remaining_coupons]):
             return ret_none
         # Могу быть None 1 из
@@ -359,6 +360,7 @@ class Moex:
                 remaining_coupons = int(remaining_coupons)
                 initial_face_value = float(initial_face_value)
                 price_percent = float(price_percent)
+                days_to_coupondate = float(days_to_coupondate)
                 if finish_days <= 0:
                     return ret_none
 
@@ -368,7 +370,7 @@ class Moex:
                         coupon_frequency = float(coupon_frequency)
                         if coupon_frequency == 0:
                             return ret_none
-                        nkd = finish_days*coupon_value / \
+                        nkd = days_to_coupondate*coupon_value / \
                             (365/coupon_frequency)
                     else:
                         return ret_none
@@ -378,8 +380,14 @@ class Moex:
                 real_price = initial_face_value * price_percent / 100
                 if real_price <= 0:
                     return ret_none
-                total_percent = (initial_face_value - real_price + coupon_value - nkd - commission + (
-                    coupon_value*(remaining_coupons-1))) * yield_commission / real_price * 100
+                if remaining_coupons != 0:
+                    total_percent = (initial_face_value - real_price + coupon_value - nkd - commission + (
+                        coupon_value*(remaining_coupons-1))) * yield_commission / real_price * 100
+                else:
+                    finish_days = days_to_finish
+                    total_percent = (initial_face_value - real_price -
+                                     commission) * yield_commission / real_price * 100
+
                 year_percent = total_percent / finish_days * 365
                 month_percent = total_percent / finish_days * 30 if finish_days > 30 else 0
 
